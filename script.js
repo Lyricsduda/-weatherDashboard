@@ -180,3 +180,13 @@ async function displayLocationFiveDayForecast() {
     }
     $("#forecastContainer").html(locationForecastDiv);
 }
+// Function to send infromation from the weather history to the displayWeatherLocation function
+function historydisplayWeatherLocation() {
+    cityLocationName = $(this).attr("data-name");
+    displayWeatherLocation();
+    displayLocationFiveDayForecast();
+
+
+}
+
+$(document).on("click", ".city", historydisplayWeatherLocation);
