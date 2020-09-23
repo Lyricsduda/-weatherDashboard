@@ -141,3 +141,42 @@ async function displayWeatherLocation() {
     currentLocationWeatherDiv.append(uvIndexEl);
     $("#weatherContainer").html(currentLocationWeatherDiv);
 }
+// Function to call the OpenweatherAPI to call the 5 day forcast
+async function displayLocationFiveDayForecast() {
+
+    var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityLocationName + "&units=imperial&appid=c5dfa25345c05369d6aadd02f49f5e15";
+
+    var response = await $.ajax({
+        url: queryURL,
+        method: "GET"
+    })
+    var locationForecastDiv = $("<div  id='fiveDayForecast'>");
+    var locationForecastHeader = $("<h5 class='card-header border-secondary'>").text("5 Day Forecast");
+    locationForecastDiv.append(locationForecastHeader);
+    var cardDeck = $("<div  class='card-deck'>");
+    locationForecastDiv.append(cardDeck);
+
+
+    for (i = 0; i < 5; i++) {
+        var locationForecastCard = $("<div class='card mb-3 mt-3'>");
+        var locationCardBody = $("<div class='card-body'>");
+        var date = new Date();
+        var val = (date.getMonth() + 1) + "/" + (date.getDate() + i + 1) + "/" + date.getFullYear();
+        var locationForecastDate = $("<h5 class='card-title'>").text(val);
+
+        locationCardBody.append(locationForecastDate);
+        var getCurrentLocationWeather = response.list[i].weather[0].icon;
+
+        var displayWeatherLocation = $(getCurrentLocationWeather);
+        locationCardBody.append(displayWeatherLocation);
+        var getLocationTemp = response.list[i].main.temp;
+        var locationTempEl = $("<p class='card-text'>").text("Temp: " + getLocationTemp + "° F");
+        locationCardBody.append(locationTempEl);
+        var getLocationHumidity = response.list[i].main.humidity;
+        var locationHumidityEl = $("<p class='card-text'>").text("Humidity: " + getLocationHumidity + "%");
+        locationCardBody.append(locationHumidityEl);
+        locationForecastCard.append(locationCardBody);
+        cardDeck.append(locationForecastCard);
+    }
+    $("#forecastContainer").html(locationForecastDiv);
+}
