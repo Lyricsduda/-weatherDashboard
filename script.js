@@ -33,10 +33,10 @@ function initCityList() {
 
 // Funtion that pulls the city that was searched into local storage to be displayed
 function initWeather() {
-    var sttoredWeatherLocationLocation = JSON.parse(localStorage.getItem("currentCity"));
+    var storedWeatherLocation = JSON.parse(localStorage.getItem("currentCity"));
 
-    if (sttoredWeatherLocationLocation !== null) {
-        cityLocationName = sttoredWeatherLocationLocation;
+    if (storedWeatherLocation !== null) {
+        cityLocationName = storedWeatherLocation;
 
         displayWeatherLocation();
         displayLocationFiveDayForecast();
@@ -53,3 +53,30 @@ function storeCurrentCity() {
 
     localStorage.setItem("currentCity", JSON.stringify(cityLocationName));
 }
+
+// onClick event to activate the search button
+$("#citySearchBtn").on("click", function (event) {
+    event.preventDefault();
+
+    cityLocationName = $("#cityInput").val().trim();
+    if (cityLocationName === "") {
+        alert("Please enter a city to look the weather up for")
+
+    } else if (cityLocationList.length >= 5) {
+        cityLocationList.shift();
+        cityLocationList.push(cityLocationName);
+
+    } else {
+        cityLocationList.push(cityLocationName);
+    }
+    storeCurrentCity();
+    storeCityArray();
+    renderCities();
+    displayWeatherLocation();
+    displayLocationFiveDayForecast();
+});
+
+// Event handler that activates after the user enters a search term
+$("#cityInput").keypress(function (e) {
+    if (e.which == 13) {
+        $("#citySearchBtn").click();
