@@ -80,3 +80,64 @@ $("#citySearchBtn").on("click", function (event) {
 $("#cityInput").keypress(function (e) {
     if (e.which == 13) {
         $("#citySearchBtn").click();
+    }
+})
+
+// Function to call the OpenweatherAPI to call the weather information
+async function displayWeatherLocation() {
+
+    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + cityLocationName + "&units=imperial&appid=c5dfa25345c05369d6aadd02f49f5e15";
+
+    var response = await $.ajax({
+        url: queryURL,
+        method: "GET"
+    })
+
+
+    var currentLocationWeatherDiv = $("<div class='card-body' id='currentWeather'>");
+    var getCurrentLocationCity = response.name;
+    var date = new Date();
+    var val = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+    var getCurrentLocationWeather = response.weather[0].icon;
+    var displayCurrentWeather = $(getCurrentLocationWeather);
+    var currentCityLocationEl = $("<h3 class = 'card-body'>").text(getCurrentLocationCity + " (" + val + ")");
+    currentCityLocationEl.append(displayCurrentWeather);
+    currentLocationWeatherDiv.append(currentCityLocationEl);
+    var getLocationTemp = response.main.temp.toFixed(1);
+    var locationTempEl = $("<p class='card-text'>").text("Temperature: " + getLocationTemp + "° F");
+    currentLocationWeatherDiv.append(locationTempEl);
+    var getLocationHumidity = response.main.humidity;
+    var locationHumidityEl = $("<p class='card-text'>").text("Humidity: " + getLocationHumidity + "%");
+    currentLocationWeatherDiv.append(locationHumidityEl);
+    var getLocationWindSpeed = response.wind.speed.toFixed(1);
+    var LocationWindSpeedEl = $("<p class='card-text'>").text("Wind Speed: " + getLocationWindSpeed + " mph");
+    currentLocationWeatherDiv.append(LocationWindSpeedEl);
+    var getLong = response.coord.lon;
+    var getLat = response.coord.lat;
+
+    var uvURL = "https://api.openweathermap.org/data/2.5/uvi?appid=d3b85d453bf90d469c82e650a0a3da26&lat=" + getLat + "&lon=" + getLong;
+    var uvResponse = await $.ajax({
+        url: uvURL,
+        method: "GET"
+    })
+
+    // Pulls the UV info from the API and displays it with styling
+    var getLocationUVIndex = uvResponse.value;
+    var uvLocationNumber = $("<span>");
+    if (getLocationUVIndex > 0 && getLocationUVIndex <= 2.99) {
+        uvLocationNumber.addClass("lowUVI");
+    } else if (getLocationUVIndex >= 3 && getLocationUVIndex <= 5.99) {
+        uvLocationNumber.addClass("moderateUVI");
+    } else if (getLocationUVIndex >= 6 && getLocationUVIndex <= 7.99) {
+        uvLocationNumber.addClass("highUVI");
+    } else if (getLocationUVIndex >= 8 && getLocationUVIndex <= 10.99) {
+        uvLocationNumber.addClass("veryHighUVI");
+    } else {
+        uvLocationNumber.addClass("extremeUVI");
+    }
+    uvLocationNumber.text(getLocationUVIndex);
+    var uvIndexEl = $("<p class='card-text'>").text("UV Index: ");
+    uvLocationNumber.appendTo(uvIndexEl);
+    currentLocationWeatherDiv.append(uvIndexEl);
+    $("#weatherContainer").html(currentLocationWeatherDiv);
+}
